@@ -22,7 +22,6 @@ import android.os.Looper;
 
 import java.util.ArrayList;
 
-import static android.location.LocationManager.GPS_PROVIDER;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.robolectric.RuntimeEnvironment.application;
@@ -31,12 +30,12 @@ import static org.robolectric.RuntimeEnvironment.application;
 @Config(constants = BuildConfig.class, sdk = 21, manifest = Config.NONE)
 public class LostClientManagerTest extends BaseRobolectricTest {
 
-  ClientManager manager = LostClientManager.shared();
+  LostClientManager manager = LostClientManager.shared();
   Context context = mock(Context.class);
   LostApiClient client = new LostApiClient.Builder(context).build();
 
   @After public void tearDown() {
-    manager.shutdown();
+    manager.clearClients();
   }
 
   @Test public void shouldHaveZeroClientCount() {
@@ -172,24 +171,6 @@ public class LostClientManagerTest extends BaseRobolectricTest {
     assertThat(callback.getResult()).isEqualTo(result);
   }
 
-  @Test public void reportProviderEnabled_shouldNotifyListeners() {
-    manager.addClient(client);
-    LocationRequest request = LocationRequest.create();
-    TestLocationListener listener = new TestLocationListener();
-    manager.addListener(client, request, listener);
-    manager.reportProviderEnabled(GPS_PROVIDER);
-    assertThat(listener.getIsGpsEnabled()).isTrue();
-  }
-
-  @Test public void reportProviderDisabled_shouldNotifyListeners() {
-    manager.addClient(client);
-    LocationRequest request = LocationRequest.create();
-    TestLocationListener listener = new TestLocationListener();
-    manager.addListener(client, request, listener);
-    manager.reportProviderDisabled(GPS_PROVIDER);
-    assertThat(listener.getIsGpsEnabled()).isFalse();
-  }
-
   @Test public void notifyLocationAvailability_shouldNotifyCallback() {
     manager.addClient(client);
     LocationRequest request = LocationRequest.create();
@@ -257,24 +238,5 @@ public class LostClientManagerTest extends BaseRobolectricTest {
     manager.addLocationCallback(client, request, callback, looper);
     manager.removeClient(client);
     assertThat(manager.getLocationCallbacks().get(client)).isNull();
-  }
-
-  @Test public void shutdown_shouldClearAllMaps() {
-    manager.addClient(client);
-    LocationRequest request = LocationRequest.create();
-    TestLocationListener listener = new TestLocationListener();
-    manager.addListener(client, request, listener);
-
-    PendingIntent pendingIntent = mock(PendingIntent.class);
-    manager.addPendingIntent(client, request, pendingIntent);
-
-    TestLocationCallback callback = new TestLocationCallback();
-    Looper looper = mock(Looper.class);
-    manager.addLocationCallback(client, request, callback, looper);
-
-    manager.shutdown();
-    assertThat(manager.getLocationListeners()).isEmpty();
-    assertThat(manager.getPendingIntents()).isEmpty();
-    assertThat(manager.getLocationCallbacks()).isEmpty();
   }
 }

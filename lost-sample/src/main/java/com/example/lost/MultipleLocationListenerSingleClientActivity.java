@@ -31,27 +31,11 @@ public class MultipleLocationListenerSingleClientActivity extends ListActivity {
     @Override public void onLocationChanged(Location location) {
       addItem("Listener");
     }
-
-    @Override public void onProviderDisabled(String provider) {
-
-    }
-
-    @Override public void onProviderEnabled(String provider) {
-
-    }
   };
 
   LocationListener otherListener = new LocationListener() {
     @Override public void onLocationChanged(Location location) {
       addItem("Other Listener");
-    }
-
-    @Override public void onProviderDisabled(String provider) {
-
-    }
-
-    @Override public void onProviderEnabled(String provider) {
-
     }
   };
 
@@ -101,7 +85,7 @@ public class MultipleLocationListenerSingleClientActivity extends ListActivity {
       return;
     }
 
-    long interval = 3 * 60 * 1000; // 3 minutes
+    long interval = 30 * 1000; // 30 seconds
     LocationRequest request = LocationRequest.create()
         .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
         .setFastestInterval(interval)
@@ -109,7 +93,7 @@ public class MultipleLocationListenerSingleClientActivity extends ListActivity {
 
     LocationServices.FusedLocationApi.requestLocationUpdates(lostApiClient, request, listener);
 
-    interval = 30 * 1000; // 30 seconds
+    interval = 15 * 1000; // 15 seconds
     request = LocationRequest.create()
         .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
         .setFastestInterval(interval)

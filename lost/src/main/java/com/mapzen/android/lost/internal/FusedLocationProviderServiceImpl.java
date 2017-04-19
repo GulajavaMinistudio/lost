@@ -40,11 +40,6 @@ public class FusedLocationProviderServiceImpl implements LocationEngine.Callback
     locationEngine = new FusionEngine(context, this);
   }
 
-  public void shutdown() {
-    locationEngine.setRequest(null);
-    clientManager.shutdown();
-  }
-
   public Location getLastLocation(LostApiClient client) {
     return locationEngine.getLastLocation();
   }
@@ -142,13 +137,11 @@ public class FusedLocationProviderServiceImpl implements LocationEngine.Callback
 
   @RequiresPermission(anyOf = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION})
   public void reportProviderDisabled(String provider) {
-    clientManager.reportProviderDisabled(provider);
     notifyLocationAvailabilityChanged();
   }
 
   @RequiresPermission(anyOf = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION})
   public void reportProviderEnabled(String provider) {
-    clientManager.reportProviderEnabled(provider);
     notifyLocationAvailabilityChanged();
     LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
     manager.requestSingleUpdate(provider, new android.location.LocationListener() {
